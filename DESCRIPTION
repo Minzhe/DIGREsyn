@@ -1,0 +1,12 @@
+Package: DIGREsyn
+Type: Package
+Title: Drug Induced Genomic Residual Effect (DIGRE) model
+Version: 0.1.0
+Date: 2016-7-14
+Author: Jicheng Yang, Sangin Lee, Minzhe Zhang
+Maintainer: Minzhe Zhang <Minzhe.Zhang@UTSouthwestern.edu>
+Description: Functions to predict drug pair synergy/antagonism by Drug Induced Genomic Residual Effect (DIGRE)
+Imports: preprocessCore, KEGGgraph, org.Hs.eg.db, AnnotationDbi, BiocGenerics
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 5.0.1
