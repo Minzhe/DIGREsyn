@@ -11,6 +11,8 @@
 #' of two different drug dose response curve.
 #' @param pathway pathway information used in DIGRE model. User would specify either "KEGG" to use the KEGG
 #' pathway information or "GeneNet" to use the gene network information.
+#' @param geneNet optional parameter. If pathway parameter is "GeneNet", then specify this parameter to use 
+#' your own gene network data. If pathway parameter is "KEGG", then do not set this parameter.
 #' @param fold a value between 0 and 1. Gene expression fold change above this value would be considered
 #' as upregulated, below the opposite number would be considered as downregulated, otherwise would be
 #' considered as no effect. The default value is 0.6.
@@ -29,7 +31,7 @@
 #' Bansal M, Yang J, Karan C, et al. A community computational challenge to predict the activity of pairs of compounds[J].
 #' Nature biotechnology, 2014, 32(12): 1213-1222.
 #' @seealso
-#' Yang J, Tang H, Li Y, et al. DIGRE: Drug‐Induced Genomic Residual Effect Model for Successful Prediction of Multidrug
+#' Yang J, Tang H, Li Y, et al. DIGRE: Drug Induced Genomic Residual Effect Model for Successful Prediction of Multidrug
 #' Effects[J]. CPT: pharmacometrics & systems pharmacology, 2015, 4(2): 91-97.
 #'
 #' @export
@@ -38,20 +40,28 @@
 
 
 
-DIGREscore <- function(geneExpDiff, doseRes, pathway = "KEGG", fold = 0.60) {
+DIGREscore <- function(geneExpDiff, doseRes, pathway = "KEGG", geneNet, fold = 0.60) {
 
-      cat("Start scoring compound pairs by DIGRE model......\n")
-      if (pathway == "KEGG") {
-            cat("Using KEGG pathway(default) information\n")
-      } else if (pathway == "GeneNet") {
-            CGP.mat <- mCGP.mat
-            GP.mat <- mGP.mat
-            cat("Using lymphoma gene network information\n")
+      cat("Start scoring compound pairs by DIGRE model ...\n")
+      cat("------------\n")
+      
+      ### load pathway matrix
+      data("CGP.mat", "KEGGnet.mat")
+      if (pathway == "KEGG") {      # using KEGG pathway
+            if (missing(geneNet)) {
+                  cat("Using KEGG pathway(default) information\n")
+                  GP.mat <- KEGGnet.mat
+            } else {
+                  stop("Error: Conflict of gene network. Do not specify geneNet parameter if using KEGG pathway, or set pathway to be GeneNet to continue use your own gene network.")
+            }
+      } else if (pathway == "GeneNet") {  # using own gene network
+            GP.mat <- geneNet
+            cat("Using self-constructed gene network information\n")
       } else {
-            stop('pathway must be either "KEGG" or "GeneNet"\n')
+            stop('Pathway must be either "KEGG" or "GeneNet"\n')
       }
+      
       cat("Fold change cut off used:", fold, "(default:0.6)\n")
-      fold <- fold - 0.01
 
       ### Translate gene name to KEGG id
       KEGG.id <- gene2KEGGid(geneExpDiff$Gene)
@@ -127,12 +137,10 @@ DIGREscore <- function(geneExpDiff, doseRes, pathway = "KEGG", fold = 0.60) {
             sim.score.mat[i,-(1:2)] <- colMeans(sim.score.pair[,-(1:2)])
       }
       pair.rank <- data.frame(sim.score.mat[,c("drugA", "drugB", "Score")], Rank = rank(-sim.score.mat$Score))
-      cat("\nScoring done.\n")
+      cat("Done scoring.\n")
       return(list(scoreRank = pair.rank, rawTable = sim.score.mat))
 
 } # function
-
-
 
 
 ### translate gene name to KEGG id
@@ -203,24 +211,24 @@ iSim.score <- function(geneExpDiff.pair, CGP.mat, GP.mat) {
 #'
 #' This function profile the drug treated gene expression data to prepare the input for DIGREscore function.
 #'
-#' @param file a file contains the drug treated gene expression data (.csv file accepted)
+#' @param geneExp a data frame contains the drug treated gene expression data.
 #' @return a matrix of processed gene expression data.
 #'
 #' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
 #' @details
-#' Input file should be gene expression profiles of single compound-treated and negative control-treated cell line sample.
-#' Data needs to be log2 transformed. This function will average duplicated data with same drug name. And collapse multiple
+#' Input data should be gene expression profiles of single compound-treated and negative control-treated cell line sample.
+#' Data needs to be log2 transformed. This function will average duplicated data with same drug name, and collapse multiple
 #' probes data to gene level.
 #'
 #' @export
 #' @importFrom preprocessCore normalize.quantiles
 
 
-profileGeneExp <- function(file) {
-
-      ### Read drug treated gene expression data
-      geneExp <- readGeneExp.csv(file)
-
+profileGeneExp <- function(geneExp) {
+      
+      cat("Start parse drug treated gene expression data ...\n")
+      cat("------------\n")
+      
       ### Average duplicated drug data
       geneExp.mat <- geneExp.aveDrug(geneExp)
 
@@ -233,27 +241,16 @@ profileGeneExp <- function(file) {
       ### Convert probe level to gene level
       geneExp.profile <- prob2gene(geneExp.mat)
 
-      cat("\nProfiling done.\n")
+      cat("Done parsing drug treated gene expression data.\n")
       return(geneExp.profile)
 
-}
-
-
-### Read drug treated gene expression data
-readGeneExp.csv <- function(file) {
-      cat("\n\nLoading dose response curve data......\n")
-      cat("=========================================================\n")
-      geneExp <- read.csv(file = file, header = FALSE, stringsAsFactors = FALSE)
-      return(geneExp)
 }
 
 
 ### Average duplicated drug data in gene expression file
 geneExp.aveDrug <- function(geneExp) {
 
-      cat("\n\nAnalyzing the drug treated gene expression data......\n")
-      cat("=========================================================\n")
-
+      cat("Checking drug name ...\n")
       ### Check duplicated drugs
       if (any(duplicated(as.character(geneExp[1,-1])))) {
             cat("Duplicated drug name found, average duplicated data.\n")
@@ -261,10 +258,16 @@ geneExp.aveDrug <- function(geneExp) {
 
       ### Print drug list
       drugName <- sort(unique(as.character(geneExp[1,-1])))
-      if (!("Neg_control" %in% drugName)) {stop("Negative control not found. Plase involve Neg_control column in the file.")}
+      if (!("Neg_control" %in% drugName)) {
+            stop("Error: Negative control not found. Plase involve Neg_control column in the file.\n")
+      }
       cat("Drug list you provided:\n")
+      idx <- 1
       for (i in 1:length(drugName)) {
-            if (drugName[i] != "Neg_control") cat("*", drugName[i], "\n")
+            if (drugName[i] != "Neg_control") {
+                  cat(idx, ". ", drugName[i], "\n", sep = "")
+                  idx <- idx + 1
+            }
       }
 
       ### Average dupliacte drug data (if any)
@@ -286,6 +289,7 @@ geneExp.aveDrug <- function(geneExp) {
 ### Quantile normalize gene expression data
 normGeneExp <- function(geneExp) {
 
+      cat("Normalizing data ...\n")
       drugName <- colnames(geneExp)[-1]; geneName <- geneExp[,1]
       geneExp.mat <- normalize.quantiles(as.matrix(geneExp[,-1]))
       colnames(geneExp.mat) <- drugName
@@ -298,6 +302,7 @@ normGeneExp <- function(geneExp) {
 ### Subtract nagtive control effect
 geneExp.diffCtl <- function(geneExp) {
 
+      cat("Measuring gene expression difference ...\n")
       neg_control <- geneExp[,"Neg_control"]
       for (i in 2:ncol(geneExp)) {
             geneExp[,i] <- geneExp[,i] - neg_control
@@ -313,7 +318,7 @@ geneExp.diffCtl <- function(geneExp) {
 ### Conver probe level to gene level
 prob2gene <- function(geneExp) {
 
-      cat("\n\nCollapse multiple probes to genes......\n")
+      cat("Collapse multiple probes to genes ...\n")
 
       geneName <- sapply(strsplit(geneExp$Gene, " ", fixed = TRUE), "[[", 1)
       geneExp$Gene <- geneName
@@ -323,40 +328,130 @@ prob2gene <- function(geneExp) {
       geneExp.min <- aggregate(geneExp[,-1], by = list(Gene = geneExp$Gene), FUN = min)
 
       geneExp.profile <- list(geneExp.mean = geneExp.mean, geneExp.max = geneExp.max, geneExp.min = geneExp.min)
-      return(geneExp.profile)
+      return(geneExp.profile$geneExp.max)
 }
 
 
-
-
-
-
-#' Read Drug Dose Response Data
+#' Constructing Gene Network Matrix for (DIGRE) model
 #'
-#' This function profile the drug treated gene expression data to prepare the input for DIGREscore function.
+#' This function construct gene network matrix from gene interaction to prepare the pathway information for DIGREscore function.
 #'
-#' @param file a file contains the drug dose response data (.csv file accepted)
-#' @return a matrix of drug dose response data with desired format that DIGRE can understand.
+#' @param geneNet a data frame contains gene-gene interaction inforamtion.
+#' @return a matrix of gene connectivity matrix
 #'
 #' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+#' @details
+#' Input data should have two columns of gene SYMBOL names. Each raw represents two connected nodes.
 #'
 #' @export
+#' @import org.Hs.eg.db KEGGgraph
 
-readDoseRes.csv <- function(file) {
-
-      doseRes <- read.csv(file = file, row.names = 1, check.names = FALSE)
-
-      return(doseRes)
+constGeneNet <- function(geneNet) {
+      cat("Parsing gene network data ...\n")
+      cat("------------\n")
+      
+      # convert gene SYMBOL name to KEGG id
+      source.gene <- sapply(mget(geneNet[,1], org.Hs.egSYMBOL2EG, ifnotfound = NA), "[[", 1)
+      target.gene <- sapply(mget(geneNet[,2], org.Hs.egSYMBOL2EG, ifnotfound = NA), "[[", 1)
+      geneNet.id <- data.frame(source = source.gene, target = target.gene, stringsAsFactors = FALSE)
+      
+      # delete NA
+      geneNet.id <- geneNet.id[(!(grepl("NA", source.gene))) & (!(grepl("NA", target.gene))),]
+      
+      # paste "hsa"
+      geneNet.id$source <- paste("hsa:", geneNet.id$source, sep = "")
+      geneNet.id$target <- paste("hsa:", geneNet.id$target, sep = "")
+      
+      # construct gene network matrix
+      gene.list <- union(geneNet.id$source, geneNet.id$target)
+      geneNet.mat <- matrix(0, length(gene.list), length(gene.list), dimnames = list(gene.list, gene.list))
+      
+      cat("Total", length(gene.list), "nodes, total", nrow(geneNet.id), "connnection.\n")
+      
+      # loop through each raw in geneNet.id to impute connected genes in matrix
+      for (i in 1:nrow(geneNet.id)) {
+            # symmetric matrix
+            geneNet.mat[geneNet.id[i,1],geneNet.id[i,2]] <- 1
+            geneNet.mat[geneNet.id[i,2],geneNet.id[i,1]] <- 1
+      }
+      
+      # delete self connectivity (if any)
+      diag(geneNet.mat) <- 0
+      
+      cat("Done constructing gene network matrix.\n")
+      return(geneNet.mat)
 }
 
 
 
-
-
-
-#' Cancer Growth Pathway (CGP) information (KEGG)
+#' Drug treated gene expression data
 #'
-#' A matrix contains the Cancer Growth Pathway (CGP) information built from KEGG pathway database.
+#' Data frames of drug treated gene expression example data for demo.
+#'
+#' @details
+#' This data is from NCI-DREAM challenge competition for predicting drug pairs synergy.
+#' @seealso
+#' \url{http://www.nature.com/nbt/journal/v32/n12/full/nbt.3052.html}
+#'
+#' @docType data
+#' @usage data(geneExp.demo)
+#' @keywords datasets
+
+"geneExp.demo"
+
+
+#' Dose response data
+#'
+#' Data frames of dose response example data for demo.
+#'
+#' @details
+#' This data is from NCI-DREAM challenge competition for predicting drug pairs synergy.
+#' @seealso
+#' \url{http://www.nature.com/nbt/journal/v32/n12/full/nbt.3052.html}
+#'
+#' @docType data
+#' @usage data(doseRes.demo)
+#' @keywords datasets
+
+"doseRes.demo"
+
+
+#' Lymphoma Specific Gene Network
+#'
+#' Gene-gene interaction information refined from lymphoma patients.
+#'
+#' @details
+#' We use GSE10846 to construct this network.
+#' @seealso
+#' \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE10846}
+#'
+#' @docType data
+#' @usage data(geneNetLymph)
+#' @keywords datasets
+
+"geneNetLymph"
+
+
+#' Universal KEGG pathway Gene Network
+#'
+#' Gene network constructed from KEGG pathway information.
+#'
+#' @details
+#' We selected KEGG pathways belonging to genetic information processing, environmental 
+#' information processing, cellular processing, and cancer disease. From this set of selected pathways we removed 
+#' any pathway with fewer than 10 edges. Finally we merged the remaining 32 KEGG pathways into a global pathway (GP) 
+#' which included 11642 interactions among 2322 genes.
+#'
+#' @docType data
+#' @usage data(KEGGnet.mat)
+#' @keywords datasets
+
+"KEGGnet.mat"
+
+
+#' Cancer Growth Pathway (CGP) information
+#'
+#' A matrix contains the Cancer Growth Pathway (CGP) information.
 #'
 #' @details
 #' The CGP was built using pathways empirically selected from KEGG pathway database based on our knowledge
@@ -373,54 +468,3 @@ readDoseRes.csv <- function(file) {
 #' @keywords datasets
 
 "CGP.mat"
-
-
-#' Global Pathway (GP) information (KEGG)
-#'
-#' A matrix contains the Global Pathway (GP) information built from KEGG pathway database.
-#'
-#' @details
-#' To build GP information, we selected KEGG pathways belonging to genetic information processing, environmental
-#' information processing, cellular processing, and cancer disease. From this set of selected pathways we removed
-#' any pathway with fewer than 10 edges. Finally we merged the remaining 32 KEGG pathways into a global pathway (GP)
-#' which included 11642 interactions among 2322 genes.
-#'
-#' @docType data
-#' @usage data(GP.mat)
-#' @keywords datasets
-
-"GP.mat"
-
-
-
-#' Cancer Growth Pathway (CGP) information (Gene Network)
-#'
-#' A matrix contains the Cancer Growth Pathway (CGP) information built from lymphoma gene network.
-#'
-#' @details
-#' We used GSE10846 to build the lymphoma gene network.
-#' @seealso
-#' \link{http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE10846}
-#'
-#' @docType data
-#' @usage data(mCGP.mat)
-#' @keywords datasets
-
-"mCGP.mat"
-
-
-
-#' Global Pathway (GP) information (Gene Network)
-#'
-#' A matrix contains the Global Pathway (GP) information built from lymphoma gene network.
-#'
-#' @details
-#' We used GSE10846 to build the lymphoma gene network.
-#' @seealso
-#' \link{http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE10846}
-#'
-#' @docType data
-#' @usage data(mGP.mat)
-#' @keywords datasets
-
-"mGP.mat"

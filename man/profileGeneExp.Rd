@@ -4,10 +4,10 @@
 \alias{profileGeneExp}
 \title{Profiling Drug Treated Gene Expression Data for (DIGRE) model}
 \usage{
-profileGeneExp(file)
+profileGeneExp(geneExp)
 }
 \arguments{
-\item{file}{a file contains the drug treated gene expression data (.csv file accepted)}
+\item{geneExp}{a data frame contains the drug treated gene expression data.}
 }
 \value{
 a matrix of processed gene expression data.
@@ -16,8 +16,8 @@ a matrix of processed gene expression data.
 This function profile the drug treated gene expression data to prepare the input for DIGREscore function.
 }
 \details{
-Input file should be gene expression profiles of single compound-treated and negative control-treated cell line sample.
-Data needs to be log2 transformed. This function will average duplicated data with same drug name. And collapse multiple
+Input data should be gene expression profiles of single compound-treated and negative control-treated cell line sample.
+Data needs to be log2 transformed. This function will average duplicated data with same drug name, and collapse multiple
 probes data to gene level.
 }
 \author{

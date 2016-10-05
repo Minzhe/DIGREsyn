@@ -4,7 +4,7 @@
 \alias{DIGREscore}
 \title{Drug Induced Genomic Residual Effect (DIGRE) model}
 \usage{
-DIGREscore(geneExpDiff, doseRes, pathway = "KEGG", fold = 0.6)
+DIGREscore(geneExpDiff, doseRes, pathway = "KEGG", geneNet, fold = 0.6)
 }
 \arguments{
 \item{geneExpDiff}{a matrix of drug treated gene expression data. Each column represent one drug,
@@ -16,6 +16,9 @@ of two different drug dose response curve.}
 
 \item{pathway}{pathway information used in DIGRE model. User would specify either "KEGG" to use the KEGG
 pathway information or "GeneNet" to use the gene network information.}
+
+\item{geneNet}{optional parameter. If pathway parameter is "GeneNet", then specify this parameter to use 
+your own gene network data. If pathway parameter is "KEGG", then do not set this parameter.}
 
 \item{fold}{a value between 0 and 1. Gene expression fold change above this value would be considered
 as upregulated, below the opposite number would be considered as downregulated, otherwise would be
@@ -45,7 +48,7 @@ Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
 Bansal M, Yang J, Karan C, et al. A community computational challenge to predict the activity of pairs of compounds[J].
 Nature biotechnology, 2014, 32(12): 1213-1222.
 
-Yang J, Tang H, Li Y, et al. DIGRE: Drug‐Induced Genomic Residual Effect Model for Successful Prediction of Multidrug
+Yang J, Tang H, Li Y, et al. DIGRE: Drug Induced Genomic Residual Effect Model for Successful Prediction of Multidrug
 Effects[J]. CPT: pharmacometrics & systems pharmacology, 2015, 4(2): 91-97.
 }
 

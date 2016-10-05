@@ -3,13 +3,13 @@
 \docType{data}
 \name{CGP.mat}
 \alias{CGP.mat}
-\title{Cancer Growth Pathway (CGP) information (KEGG)}
+\title{Cancer Growth Pathway (CGP) information}
 \format{An object of class \code{matrix} with 932 rows and 932 columns.}
 \usage{
 data(CGP.mat)
 }
 \description{
-A matrix contains the Cancer Growth Pathway (CGP) information built from KEGG pathway database.
+A matrix contains the Cancer Growth Pathway (CGP) information.
 }
 \details{
 The CGP was built using pathways empirically selected from KEGG pathway database based on our knowledge
