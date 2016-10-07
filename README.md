@@ -55,6 +55,19 @@ geneNetLymph.mat <- constGeneNet(geneNet = geneNetLymph)
 ### Scoring pair synergy ###
 `DIGREscore` is the core function in `DIGREsyn` package to calculate all the possible compound pairs synergistic score and their ranks. <u>*(Notice: following we are using default cut off 0.6 for gene expression difference, we could also set your own preferable value.)*</u>
 ```{r}
-res.KEGG <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "KEGG")
+res.KEGG <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "KEGG", fold = 0.6)
 res.geneNet <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "GeneNet", geneNet = geneNetLymph.mat)
 ```
+
+## Visualization
+`DIGREvis` function is to visualize prediction result, specify parameter `type` to be either `heat` or `bar`.
+```{r}
+vis.heat <- DIGREvis(pred.pair = res.KEGG$scoreRank, type = "heat")
+vis.bar <- DIGREvis(pred.pair = res.KEGG$scoreRank, type = "bar")
+print(vis.heat)
+print(vis.bar)
+```
+
+## Version update
+0.1.0: First release. (7-14-2016)
+0.2.0: Support de novo construction of gene network. (10-7-2016)
