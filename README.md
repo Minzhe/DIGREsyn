@@ -13,11 +13,6 @@ Cite our paper:
 ## Before started
 If user want to use DIGRE model to predict your own compounds data, we suggest you read our DIGRE model paper first to get famillar with all experiment settings and generate corresponding experimental data that DIGRE could recognize. If you just want to have an idea about how DIGRE works, you could look at this document and try to run demo files.
 
-### DIGRE work flow ###
-  
--**Drug treated gene expression data**:   
--**Drug dose response data**:   
--**Pathway information**: 
 
 ## Get started
 ### Install ###
@@ -59,7 +54,7 @@ res.KEGG <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathwa
 res.geneNet <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "GeneNet", geneNet = geneNetLymph.mat)
 ```
 
-## Visualization
+## Result visualization
 `DIGREvis` function is to visualize prediction result, specify parameter `type` to be either `heat` or `bar`.
 ```{r}
 vis.heat <- DIGREvis(pred.pair = res.KEGG$scoreRank, type = "heat")
@@ -69,5 +64,5 @@ print(vis.bar)
 ```
 
 ## Version update
-0.1.0: First release. (7-14-2016)
+0.1.0: First release. (7-14-2016)  
 0.2.0: Support de novo construction of gene network. (10-7-2016)
