@@ -35,7 +35,7 @@ geneExpDiff <- profileGeneExp(geneExp = geneExp.demo)
 ```
 
 **2. Read dose response data**  
-Parse and plot your dose response curve of each compound by yourself (we are not providing functions here), and extract two important value from the curve for each drug which DIGREsyn need to do prediction. The two value of each compound are 1) cell viability reduction(*percentage of cell killed in a certain dose*) under single dose(*compound concentration used for genomic profiling*) 2) cell viability reduction under double dose. In the demo file, we are using IC20 for the drug-treated gene expression data, so we look for viability reduction under IC20 and 2 \* IC20 concentration. </u>*(Notice: Please check the drug name in dose response data, it should exactly match the drug name in gene expression data. Be careful when read those data into R, R will check column names and will convert space to dot.)*</u>
+Parse and plot your dose response curve of each compound by yourself (we are not providing functions here), and extract two important value from the curve for each drug which DIGREsyn need to do prediction. The two value of each compound are 1) cell viability reduction(*percentage of cell killed in a certain dose*) under single dose(*compound concentration used for genomic profiling*) 2) cell viability reduction under double dose. In the demo file, we are using IC20 for the drug-treated gene expression data, so we look for viability reduction under IC20 and 2 \* IC20 concentration. <u>*(Notice: Please check the drug name in dose response data, it should exactly match the drug name in gene expression data. Be careful when read those data into R, R will check column names and will convert space to dot.)*</u>
 ```{r}
 data(doseRes.demo)
 ```

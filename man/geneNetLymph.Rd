@@ -4,7 +4,7 @@
 \name{geneNetLymph}
 \alias{geneNetLymph}
 \title{Lymphoma Specific Gene Network}
-\format{An object of class \code{data.frame} with 29055 rows and 2 columns.}
+\format{An object of class \code{matrix} with 13248 rows and 2 columns.}
 \usage{
 data(geneNetLymph)
 }
