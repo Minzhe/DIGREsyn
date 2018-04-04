@@ -9,13 +9,15 @@
 data(doseRes.demo)
 }
 \description{
-Data frames of dose response example data for demo.
+Examplary drug dose response data of 14 drugs in NCI-DREAM challenge.
 }
 \details{
-This data is from NCI-DREAM challenge competition for predicting drug pairs synergy.
+This demo data contains dose response data of 14 drugs from NCI-DREAM challenge. 
+It contain the cell viability reduction when treated with drug in two different dose. 
+One dose is IC20 of the drug, therefore the cell viability reduction is always 0.2 for all drugs. 
+The other dose is double dose of IC20, this value is infered from the dose response curve of each drug.
 }
 \seealso{
 \url{http://www.nature.com/nbt/journal/v32/n12/full/nbt.3052.html}
 }
 \keyword{datasets}
-

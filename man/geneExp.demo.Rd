@@ -4,18 +4,19 @@
 \name{geneExp.demo}
 \alias{geneExp.demo}
 \title{Drug treated gene expression data}
-\format{An object of class \code{data.frame} with 48790 rows and 51 columns.}
+\format{An object of class \code{data.frame} with 48704 rows and 51 columns.}
 \usage{
 data(geneExp.demo)
 }
 \description{
-Data frames of drug treated gene expression example data for demo.
+Examplary gene expression data of DLBCL cell after treated with 14 different drugs.
 }
 \details{
-This data is from NCI-DREAM challenge competition for predicting drug pairs synergy.
+This data is from NCI-DREAM challenge competition for predicting drug pairs synergy. 
+OCI-LY3 human diffuse large B-cell lymphoma (DLBCL) cell line was treated by 14 different 
+drugs in its dose of IC20. 24 hours after Perturbation, gene expression level was measured.
 }
 \seealso{
 \url{http://www.nature.com/nbt/journal/v32/n12/full/nbt.3052.html}
 }
 \keyword{datasets}
-

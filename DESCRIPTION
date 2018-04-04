@@ -1,12 +1,14 @@
 Package: DIGREsyn
 Type: Package
-Title: Drug Induced Genomic Residual Effect (DIGRE) model
+Title: Drug Induced Genomic Residual Effect (DIGRE) model for predicting drug pair synergistic score
 Version: 0.2.0
 Date: 2016-10-7
 Author: Jicheng Yang, Sangin Lee, Minzhe Zhang
-Maintainer: Minzhe Zhang <Minzhe.Zhang@UTSouthwestern.edu>
-Description: Functions to predict drug pair synergy/antagonism by Drug Induced Genomic Residual Effect (DIGRE)
+Maintainer: Minzhe Zhang <zenroute.mzhang@gmail.com>
+Description: DIGREsyn is developed to predict drug pair synergism/antagonism using Drug Induced Genomic Residual Effect (DIGRE) model. DIGRE utilize drug perturbated cell gene expression profile (GEP), drug dose response curve (DRC) and gene regulatory network (GRN) information (KEGG pathway database or self-provided) to do the prediction, and output the rank of drug pairs from most synergistic to most antagnoistic.
 Imports: preprocessCore, KEGGgraph, org.Hs.eg.db, AnnotationDbi, BiocGenerics, ggplot2
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr

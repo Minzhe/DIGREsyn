@@ -2,12 +2,13 @@
 % Please edit documentation in R/DIGREsyn.R
 \name{profileGeneExp}
 \alias{profileGeneExp}
-\title{Profiling Drug Treated Gene Expression Data for (DIGRE) model}
+\title{Profiling Drug Treated Gene Expression Data}
 \usage{
 profileGeneExp(geneExp)
 }
 \arguments{
-\item{geneExp}{a data frame contains the drug treated gene expression data.}
+\item{geneExp}{a data frame contains the drug treated gene expression data with each column representing 
+one drug, and each row representing one gene. See `geneExp.demo` for example.}
 }
 \value{
 a matrix of processed gene expression data.
@@ -16,11 +17,14 @@ a matrix of processed gene expression data.
 This function profile the drug treated gene expression data to prepare the input for DIGREscore function.
 }
 \details{
-Input data should be gene expression profiles of single compound-treated and negative control-treated cell line sample.
-Data needs to be log2 transformed. This function will average duplicated data with same drug name, and collapse multiple
-probes data to gene level.
+Gene expression is measured after cell is treated by a single compound (or negative control).
+Raw data (micro array or RNA-Seq) should already be log transformed to have proper scale. 
+This function will average duplicated data with same drug name, and collapse multiple probes to gene level.
+}
+\examples{
+geneExpDiff <- profileGeneExp(geneExp = geneExp.demo)
+
 }
 \author{
-Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
 }
-

@@ -2,23 +2,27 @@
 % Please edit documentation in R/DIGREsyn.R
 \name{constGeneNet}
 \alias{constGeneNet}
-\title{Constructing Gene Network Matrix for (DIGRE) model}
+\title{Construct Gene Network Matrix}
 \usage{
 constGeneNet(geneNet)
 }
 \arguments{
-\item{geneNet}{a data frame contains gene-gene interaction inforamtion.}
+\item{geneNet}{a data frame contains gene-gene interaction. See `geneNetLymph` for example.}
 }
 \value{
 a matrix of gene connectivity matrix
 }
 \description{
-This function construct gene network matrix from gene interaction to prepare the pathway information for DIGREscore function.
+This function is to convert a gene-gene interaction table to gene network matrix, which is an input of DIGREscore function.
 }
 \details{
-Input data should have two columns of gene SYMBOL names. Each raw represents two connected nodes.
+Input gene-gene interaction table should have two columns with gene SYMBOL names. 
+Each raw represents two connected genes. The interaction is regarded as undirected.
+}
+\examples{
+geneNetLymph.mat <- constGeneNet(geneNet = geneNetLymph)
+
 }
 \author{
-Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
 }
-

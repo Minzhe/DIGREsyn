@@ -9,13 +9,15 @@
 data(geneNetLymph)
 }
 \description{
-Gene-gene interaction information refined from lymphoma patients.
+Gene-gene interaction information refined from lymphoma patients gene expression data.
 }
 \details{
-We use GSE10846 to construct this network.
+We use gene expression data from lymphoma patients (GSE10846) to construct Lymphoma-specific 
+gene network. The statistical algorithm sparse partial correlation estimation (SPACE) is used 
+to infer the network structure from the expression data.
 }
 \seealso{
 \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE10846}
+\url{https://cran.r-project.org/web/packages/space/index.html}
 }
 \keyword{datasets}
-

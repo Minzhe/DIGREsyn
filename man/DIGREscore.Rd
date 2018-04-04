@@ -12,7 +12,7 @@ each row represent one gene. The value represent the fold change of the expressi
 gene after drug treated compared to negative control.}
 
 \item{doseRes}{a matrix contains drug dose response data. Each column represent one drug, two rows
-of two different drug dose response curve.}
+of two different drug dose response curve. See `doseRes.demo` for example.}
 
 \item{pathway}{pathway information used in DIGRE model. User would specify either "KEGG" to use the KEGG
 pathway information or "GeneNet" to use the gene network information.}
@@ -29,7 +29,7 @@ a list contains two matrices. One gives the drug pair synergistic score and thei
 contains the raw data to calculate the score.
 }
 \description{
-This function estimate the compound pair synergy/antagonism .
+This function estimate the compound pair synergism/antagonism.
 It takes drug treated gene expression data and drug dose response curve data as input,
 and caculate the synergistic score using Drug Induced Genomic Residual Effect (DIGRE) model.
 }
@@ -41,8 +41,13 @@ synergistic effect, and vice versa. (Notice that this algorithm focus more on pr
 compound pairs not the exact synergistic strength. If you want to do that, maybe you should involve positive control
 in your experiment. And also the score calculated by two pathway information is not comparable.)
 }
-\author{
-Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+\examples{
+### profile gene expression data
+geneExpDiff <- profileGeneExp(geneExp = geneExp.demo)
+### DIGRE prediction
+res.KEGG <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "KEGG", fold = 0.6) # KEGG pathway 
+res.geneNet <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "GeneNet", geneNet = geneNetLymph.mat) # Gene network
+
 }
 \seealso{
 Bansal M, Yang J, Karan C, et al. A community computational challenge to predict the activity of pairs of compounds[J].
@@ -51,4 +56,6 @@ Nature biotechnology, 2014, 32(12): 1213-1222.
 Yang J, Tang H, Li Y, et al. DIGRE: Drug Induced Genomic Residual Effect Model for Successful Prediction of Multidrug
 Effects[J]. CPT: pharmacometrics & systems pharmacology, 2015, 4(2): 91-97.
 }
-
+\author{
+Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
+}

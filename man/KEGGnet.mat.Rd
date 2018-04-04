@@ -9,7 +9,7 @@
 data(KEGGnet.mat)
 }
 \description{
-Gene network constructed from KEGG pathway information.
+A matrix contains the global pathway (GP) gene-gene interaction network merged from KEGG pathway database.
 }
 \details{
 We selected KEGG pathways belonging to genetic information processing, environmental 
@@ -18,4 +18,3 @@ any pathway with fewer than 10 edges. Finally we merged the remaining 32 KEGG pa
 which included 11642 interactions among 2322 genes.
 }
 \keyword{datasets}
-

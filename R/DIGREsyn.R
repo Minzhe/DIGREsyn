@@ -1,6 +1,6 @@
 #' Drug Induced Genomic Residual Effect (DIGRE) model
 #'
-#' This function estimate the compound pair synergy/antagonism .
+#' This function estimate the compound pair synergism/antagonism.
 #' It takes drug treated gene expression data and drug dose response curve data as input,
 #' and caculate the synergistic score using Drug Induced Genomic Residual Effect (DIGRE) model.
 #'
@@ -8,7 +8,7 @@
 #' each row represent one gene. The value represent the fold change of the expression of a particular
 #' gene after drug treated compared to negative control.
 #' @param doseRes a matrix contains drug dose response data. Each column represent one drug, two rows
-#' of two different drug dose response curve.
+#' of two different drug dose response curve. See `doseRes.demo` for example.
 #' @param pathway pathway information used in DIGRE model. User would specify either "KEGG" to use the KEGG
 #' pathway information or "GeneNet" to use the gene network information.
 #' @param geneNet optional parameter. If pathway parameter is "GeneNet", then specify this parameter to use 
@@ -19,7 +19,7 @@
 #' @return a list contains two matrices. One gives the drug pair synergistic score and their rank, the other
 #' contains the raw data to calculate the score.
 #'
-#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
 #' @details
 #' This function takes drug treated gene expression data, dose-response curve data and pathway information as inputs,
 #' and calculate pair synergistic score of all the possible combination of the compound you provided, and their rank
@@ -33,6 +33,13 @@
 #' @seealso
 #' Yang J, Tang H, Li Y, et al. DIGRE: Drug Induced Genomic Residual Effect Model for Successful Prediction of Multidrug
 #' Effects[J]. CPT: pharmacometrics & systems pharmacology, 2015, 4(2): 91-97.
+#' 
+#' @examples 
+#' ### profile gene expression data
+#' geneExpDiff <- profileGeneExp(geneExp = geneExp.demo)
+#' ### DIGRE prediction
+#' res.KEGG <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "KEGG", fold = 0.6) # KEGG pathway 
+#' res.geneNet <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "GeneNet", geneNet = geneNetLymph.mat) # Gene network
 #'
 #' @export
 #' @import org.Hs.eg.db KEGGgraph AnnotationDbi
@@ -137,7 +144,7 @@ DIGREscore <- function(geneExpDiff, doseRes, pathway = "KEGG", geneNet, fold = 0
             sim.score.mat[i,-(1:2)] <- colMeans(sim.score.pair[,-(1:2)])
       }
       pair.rank <- data.frame(sim.score.mat[,c("drugA", "drugB", "Score")], Rank = rank(-sim.score.mat$Score))
-      cat("Done scoring.\n")
+      cat("Done scoring.")
       return(list(scoreRank = pair.rank, rawTable = sim.score.mat))
 
 } # function
@@ -207,18 +214,22 @@ iSim.score <- function(geneExpDiff.pair, CGP.mat, GP.mat) {
 
 
 
-#' Profiling Drug Treated Gene Expression Data for (DIGRE) model
+#' Profiling Drug Treated Gene Expression Data
 #'
 #' This function profile the drug treated gene expression data to prepare the input for DIGREscore function.
 #'
-#' @param geneExp a data frame contains the drug treated gene expression data.
+#' @param geneExp a data frame contains the drug treated gene expression data with each column representing 
+#' one drug, and each row representing one gene. See `geneExp.demo` for example.
 #' @return a matrix of processed gene expression data.
 #'
-#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
 #' @details
-#' Input data should be gene expression profiles of single compound-treated and negative control-treated cell line sample.
-#' Data needs to be log2 transformed. This function will average duplicated data with same drug name, and collapse multiple
-#' probes data to gene level.
+#' Gene expression is measured after cell is treated by a single compound (or negative control).
+#' Raw data (micro array or RNA-Seq) should already be log transformed to have proper scale. 
+#' This function will average duplicated data with same drug name, and collapse multiple probes to gene level.
+#'
+#' @examples 
+#' geneExpDiff <- profileGeneExp(geneExp = geneExp.demo)
 #'
 #' @export
 #' @importFrom preprocessCore normalize.quantiles
@@ -332,16 +343,20 @@ prob2gene <- function(geneExp) {
 }
 
 
-#' Constructing Gene Network Matrix for (DIGRE) model
+#' Construct Gene Network Matrix
 #'
-#' This function construct gene network matrix from gene interaction to prepare the pathway information for DIGREscore function.
+#' This function is to convert a gene-gene interaction table to gene network matrix, which is an input of DIGREscore function.
 #'
-#' @param geneNet a data frame contains gene-gene interaction inforamtion.
+#' @param geneNet a data frame contains gene-gene interaction. See `geneNetLymph` for example.
 #' @return a matrix of gene connectivity matrix
 #'
-#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
 #' @details
-#' Input data should have two columns of gene SYMBOL names. Each raw represents two connected nodes.
+#' Input gene-gene interaction table should have two columns with gene SYMBOL names. 
+#' Each raw represents two connected genes. The interaction is regarded as undirected.
+#'
+#' @examples 
+#' geneNetLymph.mat <- constGeneNet(geneNet = geneNetLymph)
 #'
 #' @export
 #' @import org.Hs.eg.db KEGGgraph
@@ -392,9 +407,15 @@ constGeneNet <- function(geneNet) {
 #' @param type specify "heat" or "bar" to plot whether heatmap or barplot
 #' @return ggplot object of the heatmap or barplot of compound pairs synergistic score.
 #'
-#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+#' @author Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
 #' @details
-#' Please direct apply this funtion to the result got from DIGREscore funtion.
+#' Please directly apply this funtion to the result got from DIGREscore funtion.
+#'
+#' @examples 
+#' vis.heat <- DIGREvis(pred.pair = res.KEGG$scoreRank, type = "heat")
+#' vis.bar <- DIGREvis(pred.pair = res.KEGG$scoreRank, type = "bar")
+#' plot(vis.heat)
+#' plot(vis.bar)
 #'
 #' @export
 #' @import ggplot2
@@ -407,7 +428,7 @@ DIGREvis <- function(pred.pair, type) {
             
             p <- ggplot(pred.pair, aes(drugA, drugB)) + geom_tile(aes(fill = Score), colour = "white") + scale_fill_gradient(low = "white", high = "steelblue")
             p.title <- ggtitle("Heatmap of compound pair synergistic scores\n")
-            p.theme <- theme(plot.title = element_text(size = 18, lineheight = 0.8, face = "bold"), 
+            p.theme <- theme(plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", hjust = 0.5), 
                        axis.text.x = element_text(angle = 45, hjust = 1, colour = "black"), 
                        axis.text.y = element_text(colour = "black"), 
                        axis.title.x = element_text(face = "bold"), 
@@ -435,7 +456,7 @@ DIGREvis <- function(pred.pair, type) {
             
             p <- ggplot(rankScore, aes(DrugPair, Score)) + geom_bar(stat = "identity", fill = "steelblue")
             p.title <- ggtitle("Top compound pair synergistic scores\n")
-            p.theme <- theme(plot.title = element_text(size = 18, lineheight = 0.8, face = "bold"), 
+            p.theme <- theme(plot.title = element_text(size = 18, lineheight = 0.8, face = "bold", hjust = 0.5), 
                              axis.text.x = element_text(size = 12, angle = 45, hjust = 1, colour = "black"), 
                              axis.text.y = element_text(size = 12, colour = "black"), 
                              axis.title.x = element_text(size = 12, face = "bold"), 
@@ -450,10 +471,12 @@ DIGREvis <- function(pred.pair, type) {
 
 #' Drug treated gene expression data
 #'
-#' Data frames of drug treated gene expression example data for demo.
+#' Examplary gene expression data of DLBCL cell after treated with 14 different drugs.
 #'
 #' @details
-#' This data is from NCI-DREAM challenge competition for predicting drug pairs synergy.
+#' This data is from NCI-DREAM challenge competition for predicting drug pairs synergy. 
+#' OCI-LY3 human diffuse large B-cell lymphoma (DLBCL) cell line was treated by 14 different 
+#' drugs in its dose of IC20. 24 hours after Perturbation, gene expression level was measured.
 #' @seealso
 #' \url{http://www.nature.com/nbt/journal/v32/n12/full/nbt.3052.html}
 #'
@@ -466,10 +489,13 @@ DIGREvis <- function(pred.pair, type) {
 
 #' Dose response data
 #'
-#' Data frames of dose response example data for demo.
+#' Examplary drug dose response data of 14 drugs in NCI-DREAM challenge.
 #'
 #' @details
-#' This data is from NCI-DREAM challenge competition for predicting drug pairs synergy.
+#' This demo data contains dose response data of 14 drugs from NCI-DREAM challenge. 
+#' It contain the cell viability reduction when treated with drug in two different dose. 
+#' One dose is IC20 of the drug, therefore the cell viability reduction is always 0.2 for all drugs. 
+#' The other dose is double dose of IC20, this value is infered from the dose response curve of each drug.
 #' @seealso
 #' \url{http://www.nature.com/nbt/journal/v32/n12/full/nbt.3052.html}
 #'
@@ -482,12 +508,15 @@ DIGREvis <- function(pred.pair, type) {
 
 #' Lymphoma Specific Gene Network
 #'
-#' Gene-gene interaction information refined from lymphoma patients.
+#' Gene-gene interaction information refined from lymphoma patients gene expression data.
 #'
 #' @details
-#' We use GSE10846 to construct this network.
+#' We use gene expression data from lymphoma patients (GSE10846) to construct Lymphoma-specific 
+#' gene network. The statistical algorithm sparse partial correlation estimation (SPACE) is used 
+#' to infer the network structure from the expression data.
 #' @seealso
 #' \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE10846}
+#' \url{https://cran.r-project.org/web/packages/space/index.html}
 #'
 #' @docType data
 #' @usage data(geneNetLymph)
@@ -498,7 +527,7 @@ DIGREvis <- function(pred.pair, type) {
 
 #' Universal KEGG pathway Gene Network
 #'
-#' Gene network constructed from KEGG pathway information.
+#' A matrix contains the global pathway (GP) gene-gene interaction network merged from KEGG pathway database.
 #'
 #' @details
 #' We selected KEGG pathways belonging to genetic information processing, environmental 
@@ -513,9 +542,9 @@ DIGREvis <- function(pred.pair, type) {
 "KEGGnet.mat"
 
 
-#' Cancer Growth Pathway (CGP) information
+#' Cancer Growth Pathway (CGP)
 #'
-#' A matrix contains the Cancer Growth Pathway (CGP) information.
+#' A matrix contains the Cancer Growth Pathway (CGP) gene-gene interaction network information
 #'
 #' @details
 #' The CGP was built using pathways empirically selected from KEGG pathway database based on our knowledge

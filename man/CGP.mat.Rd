@@ -3,13 +3,13 @@
 \docType{data}
 \name{CGP.mat}
 \alias{CGP.mat}
-\title{Cancer Growth Pathway (CGP) information}
+\title{Cancer Growth Pathway (CGP)}
 \format{An object of class \code{matrix} with 932 rows and 932 columns.}
 \usage{
 data(CGP.mat)
 }
 \description{
-A matrix contains the Cancer Growth Pathway (CGP) information.
+A matrix contains the Cancer Growth Pathway (CGP) gene-gene interaction network information
 }
 \details{
 The CGP was built using pathways empirically selected from KEGG pathway database based on our knowledge
@@ -22,4 +22,3 @@ NF-kappa B signaling pathway, Cell Cycle, p53 signaling pathway, Apoptosis, TGF-
 Cancer pathway.
 }
 \keyword{datasets}
-

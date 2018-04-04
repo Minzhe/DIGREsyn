@@ -18,9 +18,15 @@ ggplot object of the heatmap or barplot of compound pairs synergistic score.
 This function plot heatmap and barplot of compound pairs synergistic score.
 }
 \details{
-Please direct apply this funtion to the result got from DIGREscore funtion.
+Please directly apply this funtion to the result got from DIGREscore funtion.
+}
+\examples{
+vis.heat <- DIGREvis(pred.pair = res.KEGG$scoreRank, type = "heat")
+vis.bar <- DIGREvis(pred.pair = res.KEGG$scoreRank, type = "bar")
+plot(vis.heat)
+plot(vis.bar)
+
 }
 \author{
-Jichen Yang, Sangin Lee, Minzhe Zhang(\email{Minzhe.Zhang@UTSouthwestern.edu})
+Jichen Yang, Sangin Lee, Minzhe Zhang(\email{zenroute.mzhang@gmail.com})
 }
-

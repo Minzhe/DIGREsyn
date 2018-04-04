@@ -1,0 +1,95 @@
+---
+title: "Drug Induced Genomic Residual Effect (DIGRE) model - DIGREsyn"
+author: "Minzhe Zhang"
+date: "28 Mar 2018"
+package: "0.2.0"
+abstract: >
+    Usually single drug does not yield good therapeutic effect in complex disease like cancer. To overcome the shortage of monotherapy such as lack of efficacy and drug resistance, now researchers are shifting from traditional “one gene, one drug, one disease” paradigm to looking for synergistic multi-drug combinations which can modulate multiple cellular process simultaneously. Traditional high throughput screening is impractical to search for effective multi-drug therapies regarding the huge volumes of possible combinations, alternative in silico approach that can predict drug synergism will greatly reduce the time and cost for experimental validations.  
+    
+    In order to encourage development of computational models for in silico drug screening, in 2012, the DREAM Challenge initiative in collaboration with the National Cancer Institute launched a community-based challenge for predicting compound pair synergism. The transcriptomic and dose response data of 14 individual drugs were generated to predict the synergistic effect of all the 91 possible drug pair combinations. Prediction performances were evaluated by the experimentally derived synergistic effect, and quantified using probabilistic concordance index (PC-index). In the challenge, the PC-index of the total 31 submission ranged from 0.61 to 0.42 (random guess has PC-index 0.5). The best performed method, Drug-Induced Genomic Residual Effect (DIGRE) model developed by our team has significantly higher PC-index (0.613), and much greater consistency comparing to the remaining methods.  
+output: 
+    rmarkdown::html_document:
+        highlight: pygments
+        toc: true
+vignette: >
+  %\VignetteIndexEntry{DIGREsyn.Rmd}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(tidy=FALSE, collapse = TRUE, comment = "#>", message=FALSE, error=FALSE, warning=TRUE)
+```
+
+**Cite our papers:**  
+["A community computational challenge to predict the activity of pairs of compounds."](http://www.nature.com/nbt/journal/v32/n12/full/nbt.3052.html) Nature biotechnology 32.12 (2014): 1213-1222.  
+["DIGRE: Drug-Induced Genomic Residual Effect Model for Successful Prediction of Multidrug Effects."](http://onlinelibrary.wiley.com/doi/10.1002/psp4.1/abstract;jsessionid=2874AA1DB0B0E048BA1041B8D46BA07D.f03t04) CPT: pharmacometrics & systems pharmacology 4.2 (2015): 91-97.
+
+## Input Data 
+
+The DIGRE model takes three forms of input data to predict the compound synergistic effect: the drug treated gene expression data, the drug dose response data and the gene-gene interaction information.
+
+#### Gene expression profile
+
+This is the gene expression profile (microarray or RNA-Seq) of cell after drug perturbation. User should prepare a dataframe with each column representing one drug, and each row representing one gene. Negative control such as DMSO treatment should be included. The demo data `geneExp.demo` we provided in the package is from NCI-DREAM challenge competition for predicting drug pairs synergy. OCI-LY3 human diffuse large B-cell lymphoma (DLBCL) cell line was treated by 14 different drugs in its dose of IC20. 24 hours after Perturbation, gene expression level was measured.
+```{r Gene expression data}
+library(DIGREsyn)
+head(geneExp.demo)
+```
+
+#### Dose response data
+
+This the dose response data of each drug. User should prepare a dataframe that contains the cell viability reduction values when cell line is treated with drug in two different dose. One drug dose is the IC20 of the drug, therefore the cell viability reduction is always 0.2 for all drugs. The other dose is double dose of IC20, this value is infered from the dose response curve of each drug. (This step should done by user himself, DIGRE only accept the processed data not raw dose response curves; currently, the two drug doses are fixed: the IC20 and double of the IC20.) The demo data `doseRes.demo` we provided in the package contains dose response data of 14 drugs from NCI-DREAM challenge. <u>*(Notice: Check the drug name in the dose response data that match exactly the drug name in the gene expression data.)*</u>
+```{r Dose response data}
+head(doseRes.demo)
+```
+
+#### Gene-gene interaction information
+
+This is the gene-gene interaction information need for DIGRE to predict drug interaction effect. User does not need to worry about this if he uses KEGG pathway in `DIGREscore` function. But if user prefer to use their own knowledge about the gene network involved in the specific cell type, then he will need to prepare this gene-gene interaction table. It should be a dataframe that has two columns with gene SYMBOL names. Each raw represents two connected genes. The interaction is regarded as undirected. The demo data `geneNetLymph` is a lymphoma-specific gene network refined from lymphoma patients gene expression data.
+```{r Gene connectivity data}
+head(geneNetLymph)
+```
+
+## Quick Start  
+
+Here we show the basic pipeline of using `DIGREsyn` to predict drug synergistic score with demo data.
+
+**1. Read and profile gene expression data**  
+Read the gene expression data of cells treated with each individual compound, and parse it with the `profileGeneExp` function. <u>*(Notice: Do not need to specify column names and row names by drug names and gene names for gene expression data as duplicated drug names and gene names are common.)*</u>
+```{r DIGRE profile gene expression}
+geneExpDiff <- profileGeneExp(geneExp = geneExp.demo)
+```
+
+**2. Read and parse gene interaction data (optional)**  
+Read the gene connectivity data to construct the gene network that DIGRE uses to compare compound effects on upstream and downstream genes. 
+```{r DIGRE gene network}
+geneNetLymph.mat <- constGeneNet(geneNet = geneNetLymph)
+```
+
+**3. Predict compound pair synergistic effect **  
+`DIGREscore` is the core function that predicts all the possible compound pair synergistic scores and their ranks. <u>*(Notice: for the following, we are using a default cut off of 0.6 for gene expression difference, but you can also set your own preferred value (from 0 to 1).)*</u>
+```{r DIGRE prediction}
+pred.res <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "GeneNet", geneNet = geneNetLymph.mat, fold = 0.6)
+```
+
+## Visualization
+The `DIGREvis` function is for visualizing prediction results. The heatmap displayes the predicted synergistic scores of all the compound pairs. Deep color indicates high synergistic score. The bar plot shows the top predicted synergistic drug pairs.
+
+**Heatmap** 
+```{r Visualization heatmap, fig.align='center'}
+vis.heat <- DIGREvis(pred.pair = pred.res$scoreRank, type = "heat")
+plot(vis.heat)
+```
+
+**Bar plot**  
+```{r Visualization barplot, fig.align='center'}
+vis.bar <- DIGREvis(pred.pair = pred.res$scoreRank, type = "bar")
+plot(vis.bar)
+```
+
+
+## Session info
+```{r sessionInfo}
+sessionInfo()
+```
