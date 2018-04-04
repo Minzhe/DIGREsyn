@@ -27,7 +27,7 @@ library(DIGREsyn)
 ### Prepare input data ###
 The DIGRE model takes three forms of input data to predict the compound synergistic effect. Users will first need to read their drug treated gene expression data, drug dose response data and gene interaction data (optional) into R. A specific format is preferred. Load the example data file to see the format.
 
-**1. Read and profile gene expression data**
+**1. Read and profile gene expression data**  
 Read the gene expression data of cells treated with each compound as well as the negative controls into R, and parse it with the `profileGeneExp` function. <u>*(Notice: Do not need to specify column names and row names by drug names and gene names for gene expression data as duplicated drug names and gene names are common.)*</u>
 ```{r}
 data(geneExp.demo)
@@ -40,7 +40,7 @@ Parse and plot the dose response curve of each compound by yourself (the functio
 data(doseRes.demo)
 ```
 
-**3. Read and parse gene interaction data (optional)**
+**3. Read and parse gene interaction data (optional)**  
 Read the gene connectivity data to construct the gene network that DIGRE uses to compare compound effects on upstream and downstream genes. DIGRE uses the constructed KEGG pathway information by default, but *de novo* construction of a gene network from the user's own data is also supported. We provide here gene interaction data refined from lymphoma patients as demo files. <u>*(Notice: Be careful to set stringAsFactor = FALSE when reading data to prevent undefined behavior.)*
 ```{r}
 data(geneNetLymph)
