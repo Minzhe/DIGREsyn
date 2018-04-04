@@ -65,5 +65,5 @@ plot(vis.bar)
 
 ## Version update
 0.1.0: First release. (07-14-2016)  
-0.2.0: Support de novo construction of gene network. (10-7-2016)
+0.2.0: Support de novo construction of gene network. (10-7-2016)  
 0.2.1: Improve documentation. (04-04-2018)
