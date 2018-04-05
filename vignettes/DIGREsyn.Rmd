@@ -74,7 +74,7 @@ pred.res <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathwa
 ```
 
 ## Visualization
-The `DIGREvis` function is for visualizing prediction results. The heatmap displayes the predicted synergistic scores of all the compound pairs. Deep color indicates high synergistic score. The bar plot shows the top predicted synergistic drug pairs.
+The `DIGREvis` function is for visualizing prediction results. The heatmap displays the predicted synergistic scores of all the compound pairs. Deep color indicates high synergistic score. The bar plot shows the top predicted synergistic drug pairs.
 
 **Heatmap** 
 ```{r Visualization heatmap, fig.align='center'}
