@@ -39,7 +39,7 @@ head(geneExp.demo)
 
 #### Dose response data
 
-This the dose response data of each drug. User should prepare a dataframe that contains the cell viability reduction values when cell line is treated with drug in two different dose. One drug dose is the IC20 of the drug, therefore the cell viability reduction is always 0.2 for all drugs. The other dose is double dose of IC20, this value is infered from the dose response curve of each drug. (This step should done by user himself, DIGRE only accept the processed data not raw dose response curves; currently, the two drug doses are fixed: the IC20 and double of the IC20.) The demo data `doseRes.demo` we provided in the package contains dose response data of 14 drugs from NCI-DREAM challenge. <u>*(Notice: Check the drug name in the dose response data that match exactly the drug name in the gene expression data.)*</u>
+This the dose response data of each drug. User should prepare a dataframe that contains the cell viability reduction values when cell line is treated with drug in two different doses. One drug dose is the IC20 of the drug, therefore the cell viability reduction is always 0.2 for all drugs. The other dose is the double of IC20, this value is infered from the dose response curve of each drug. (This step should done by user himself, DIGRE only accept the processed data not raw dose response curves; currently, the two drug doses are fixed: the IC20 and double of the IC20.) The demo data `doseRes.demo` we provided in the package contains dose response data of 14 drugs from NCI-DREAM challenge. <u>*(Notice: Check the drug name in the dose response data that match exactly the drug name in the gene expression data.)*</u>
 ```{r Dose response data}
 head(doseRes.demo)
 ```
@@ -67,7 +67,7 @@ Read the gene connectivity data to construct the gene network that DIGRE uses to
 geneNetLymph.mat <- constGeneNet(geneNet = geneNetLymph)
 ```
 
-**3. Predict compound pair synergistic effect **  
+**3. Predict compound pair synergistic effect**  
 `DIGREscore` is the core function that predicts all the possible compound pair synergistic scores and their ranks. <u>*(Notice: for the following, we are using a default cut off of 0.6 for gene expression difference, but you can also set your own preferred value (from 0 to 1).)*</u>
 ```{r DIGRE prediction}
 pred.res <- DIGREscore(geneExpDiff = geneExpDiff, doseRes = doseRes.demo, pathway = "GeneNet", geneNet = geneNetLymph.mat, fold = 0.6)
